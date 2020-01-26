@@ -8,7 +8,9 @@ void main() {
 
 bool findCommonItem(List<String> collectionA, List<String> collectionB) {
   Set<String> map = {};
-
+  if (collectionA == null || collectionB == null) {
+    return false;
+  }
   for (var i = 0; i < collectionA.length; i++) {
     map.add(collectionA[i]);
   }
