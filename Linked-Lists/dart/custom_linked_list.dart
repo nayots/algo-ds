@@ -1,47 +1,52 @@
 main(List<String> args) {
-  MyLinkedList<int> myList = MyLinkedList(1);
+  MyDoublyLinkedList<int> myList = MyDoublyLinkedList(1);
   myList.append(5);
   myList.append(16);
-  myList.append(19).append(10);
   myList.prepend(99);
   myList.prepend(89);
   myList.printList();
   myList.insert(1, 13);
   myList.insert(0, 16);
   myList.printList();
-  myList.remove(8);
+  myList.remove(6);
+  myList.remove(2);
   myList.printList();
+  // myList.reverse();
+  myList.printList();
+  myList.printList(verbose: true);
 }
 
-class MyLinkedList<T> {
+class MyDoublyLinkedList<T> {
   MyLinkedListNode<T> head;
   MyLinkedListNode<T> tail;
   int length;
-  MyLinkedList(T value) {
+  MyDoublyLinkedList(T value) {
     head = MyLinkedListNode(value);
     tail = head;
     length = 1;
   }
 
-  MyLinkedList<T> append(T value) {
+  MyDoublyLinkedList<T> append(T value) {
     MyLinkedListNode<T> val = MyLinkedListNode<T>(value);
     tail.next = val;
+    val.prev = tail;
     tail = val;
     length++;
 
     return this;
   }
 
-  MyLinkedList<T> prepend(T value) {
+  MyDoublyLinkedList<T> prepend(T value) {
     MyLinkedListNode<T> val = MyLinkedListNode<T>(value);
     val.next = head;
+    head.prev = val;
     head = val;
     length++;
 
     return this;
   }
 
-  MyLinkedList<T> insert(int index, T value) {
+  MyDoublyLinkedList<T> insert(int index, T value) {
     if (index == 0) {
       return prepend(value);
     }
@@ -50,16 +55,20 @@ class MyLinkedList<T> {
     }
     MyLinkedListNode<T> val = MyLinkedListNode<T>(value);
     MyLinkedListNode<T> leader = traverseToIndex(index - 1);
-    val.next = leader.next;
+    MyLinkedListNode<T> follower = leader.next;
+    val.next = follower;
+    val.prev = leader;
+    follower?.prev = val;
     leader.next = val;
     length++;
 
     return this;
   }
 
-  MyLinkedList<T> remove(int index) {
+  MyDoublyLinkedList<T> remove(int index) {
     MyLinkedListNode<T> leader = traverseToIndex(index - 1);
     leader.next = leader.next.next;
+    leader.next?.prev = leader;
     length--;
 
     return this;
@@ -79,11 +88,35 @@ class MyLinkedList<T> {
     return currentNode;
   }
 
-  void printList() {
-    List<T> data = List<T>();
+  // MyDoublyLinkedList<T> reverse() {
+  //   if (head.next == null) {
+  //     return this;
+  //   }
+  //   MyLinkedListNode<T> first = head;
+  //   tail = head;
+  //   MyLinkedListNode<T> second = first.next;
+  //   while (second != null) {
+  //     MyLinkedListNode<T> temp = second.next;
+  //     second.next = first;
+  //     first = second;
+  //     second = temp;
+  //   }
+
+  //   head.next = null;
+  //   head = first;
+  //   return this;
+  // }
+
+  void printList({bool verbose = false}) {
+    List<String> data = List<String>();
     var currentNode = head;
     while (currentNode != null) {
-      data.add(currentNode.value);
+      if (!verbose) {
+        data.add(currentNode.value?.toString());
+      } else {
+        data.add(
+            '(${currentNode?.prev?.value} -> ${currentNode.value} -> ${currentNode.next?.value})');
+      }
       currentNode = currentNode.next;
     }
     print(data);
@@ -92,10 +125,12 @@ class MyLinkedList<T> {
 
 class MyLinkedListNode<T> {
   T value;
+  MyLinkedListNode prev;
   MyLinkedListNode next;
 
   MyLinkedListNode(T val) {
     value = val;
     next = null;
+    prev = null;
   }
 }
