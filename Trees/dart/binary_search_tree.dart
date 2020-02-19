@@ -11,13 +11,20 @@ main(List<String> args) {
   tree.insert(170);
   tree.insert(15);
   tree.insert(1);
-  print(encoder.convert(tree.traverse(tree.root)));
-  print(encoder.convert(tree.traverse(tree.lookup(200))));
+  // print(encoder.convert(tree.traverse(tree.root)));
+  // print(encoder.convert(tree.traverse(tree.lookup(200))));
   //     9
   //  4     20
   //1  6  15  170
+  var bfsResult = tree
+      .breadthFirstSearch(); // INFO 📘: should return [9, 4, 20, 1, 6, 15, 170]
+  print(bfsResult);
+  var bfsResultR = tree.breadthFirstSearchR(Queue.from([tree.root]),
+      []); // INFO 📘: should return [9, 4, 20, 1, 6, 15, 170]
+  print(bfsResultR);
+
   tree.delete(20);
-  print(encoder.convert(tree.traverse(tree.root)));
+  // print(encoder.convert(tree.traverse(tree.root)));
 }
 
 class Node {
@@ -152,6 +159,42 @@ class BinarySearchTree {
         return;
       }
     }
+  }
+
+  List<int> breadthFirstSearch() {
+    var currentNode = root;
+    var list = List<int>();
+    Queue queue = Queue();
+    queue.add(currentNode);
+
+    while (queue.isNotEmpty) {
+      currentNode = queue.removeFirst();
+      if (currentNode.left != null) {
+        queue.add(currentNode.left);
+      }
+      if (currentNode.right != null) {
+        queue.add(currentNode.right);
+      }
+      list.add(currentNode.value);
+    }
+
+    return list;
+  }
+
+  List<int> breadthFirstSearchR(Queue<Node> queue, List<int> list) {
+    var currentNode = queue.removeFirst();
+    if (currentNode.left != null) {
+      queue.add(currentNode.left);
+    }
+    if (currentNode.right != null) {
+      queue.add(currentNode.right);
+    }
+    list.add(currentNode.value);
+
+    if (queue.isEmpty) {
+      return list;
+    }
+    return breadthFirstSearchR(queue, list);
   }
 
   traverse(node) {
