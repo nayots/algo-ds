@@ -1,6 +1,8 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'dart:ffi';
+
 main(List<String> args) {
   var encoder = JsonEncoder.withIndent(' ');
   BinarySearchTree tree = BinarySearchTree();
@@ -22,6 +24,10 @@ main(List<String> args) {
   var bfsResultR = tree.breadthFirstSearchR(Queue.from([tree.root]),
       []); // INFO 📘: should return [9, 4, 20, 1, 6, 15, 170]
   print(bfsResultR);
+  tree.dfs_inOrder(); // INFO 📘: should print [1, 4, 6, 9, 15, 20, 170]
+  tree.dfs_preOrder(); // INFO 📘: should print [9, 4, 1, 6, 20, 15, 170]
+  tree.dfs_postOrder(); // INFO 📘: should print [1, 6, 4, 15, 170, 20, 9]
+  tree.isValidBST();
 
   tree.delete(20);
   // print(encoder.convert(tree.traverse(tree.root)));
@@ -197,6 +203,23 @@ class BinarySearchTree {
     return breadthFirstSearchR(queue, list);
   }
 
+  dfs_inOrder() {
+    print('DFS In Order:  ${dfsTraverseInOrder(root, [])}');
+  }
+
+  dfs_preOrder() {
+    print('DFS Pre Order:  ${dfsTraversePreOrder(root, [])}');
+  }
+
+  dfs_postOrder() {
+    print('DFS Post Order:  ${dfsTraversePostOrder(root, [])}');
+  }
+
+  isValidBST() {
+    print(
+        'Tree is a binary search tree: ${isAValidBST(root, -999999999, 999999999)}');
+  }
+
   traverse(node) {
     if (node == null) {
       return null;
@@ -206,4 +229,66 @@ class BinarySearchTree {
     tree['right'] = node.right == null ? null : traverse(node.right);
     return tree;
   }
+}
+
+List<int> dfsTraverseInOrder(Node node, List<int> data) {
+  if (node.left != null) {
+    dfsTraverseInOrder(node.left, data);
+  }
+  data.add(node.value);
+  if (node.right != null) {
+    dfsTraverseInOrder(node.right, data);
+  }
+
+  return data;
+}
+
+List<int> dfsTraversePreOrder(Node node, List<int> data) {
+  data.add(node.value);
+  if (node.left != null) {
+    dfsTraversePreOrder(node.left, data);
+  }
+  if (node.right != null) {
+    dfsTraversePreOrder(node.right, data);
+  }
+
+  return data;
+}
+
+List<int> dfsTraversePostOrder(Node node, List<int> data) {
+  if (node.left != null) {
+    dfsTraversePostOrder(node.left, data);
+  }
+  if (node.right != null) {
+    dfsTraversePostOrder(node.right, data);
+  }
+  data.add(node.value);
+
+  return data;
+}
+
+bool isAValidBST(Node root, int min, int max) {
+  //Valid tree
+  //   2
+  //  / \
+  // 1   3
+  //Invalid tree
+  //   5
+  //  / \
+  // 1   4
+  //    / \
+  //   3   6
+  //The root node's value is 5 but its right child's value is 4.
+  if (root == null) {
+    return true;
+  }
+
+  if (min < root.value && root.value < max) {
+    bool left = isAValidBST(root.left, min, root.value);
+    bool right = isAValidBST(root.right, root.value, max);
+
+    return left && right;
+  }
+
+  return false;
 }
